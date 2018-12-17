@@ -6,6 +6,7 @@ from flask.logging import default_handler
 
 
 import workers
+from monitoring import prometheus_metrics
 
 
 def create_application():
@@ -33,11 +34,14 @@ def index():
     try:
         workers.download_job(input_data['url'], source_id, next_service)
         APP.logger.info('Job started.')
+        prometheus_metrics.data_collector_jobs_total.inc()
 
     except KeyError as exception:
         APP.logger.warning('No url provided, request denied')
+        prometheus_metrics.data_collector_jobs_denied.inc()
         return jsonify(status="FAILED", exception=str(exception)), 400
 
+    prometheus_metrics.data_collector_jobs_initiated_successfully.inc()
     return jsonify(status="OK", message="Job initiated")
 
 
