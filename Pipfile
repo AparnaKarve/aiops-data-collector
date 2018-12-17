@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 flask = "*"
 gunicorn = "*"
+prometheus_client = "*"
 requests = ">=2.20.0"
 
 [dev-packages]
