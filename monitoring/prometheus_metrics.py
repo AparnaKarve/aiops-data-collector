@@ -1,4 +1,4 @@
-from prometheus_client import Counter
+from prometheus_client import Counter, generate_latest   #noqa
 
 # Prometheus Metrics
 data_collector_jobs_total = Counter(   #noqa
