@@ -15,17 +15,25 @@ data_collector_jobs_denied = Counter(   #noqa
 )
 data_download_requests_total = Counter(   #noqa
     'data_download_requests_total',
-    'The total number of data download inprogress requests'
+    'The total number of data download requests'
+)
+data_download_successful_requests_total = Counter(   #noqa
+    'data_download_successful_requests_total',
+    'The total number of successful data download requests'
 )
 data_download_request_exceptions = Counter(   #noqa
     'data_download_request_exceptions',
-    'The total number of data download inprogress request exceptions'
+    'The total number of data download request exceptions'
 )
 post_data_requests_total = Counter(   #noqa
     'post_data_requests_total',
-    'The total number of post data inprogress requests'
+    'The total number of post data requests'
+)
+post_data_successful_requests_total = Counter(   #noqa
+    'post_data_successful_requests_total',
+    'The total number of successful post data requests'
 )
 post_data_request_exceptions = Counter(   #noqa
     'post_data_request_exceptions',
-    'The total number of post data inprogress request exceptions'
+    'The total number of post data request exceptions'
 )

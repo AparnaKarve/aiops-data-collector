@@ -32,9 +32,9 @@ def index():
     source_id = input_data.get('payload_id')
 
     try:
+        prometheus_metrics.data_collector_jobs_total.inc()
         workers.download_job(input_data['url'], source_id, next_service)
         APP.logger.info('Job started.')
-        prometheus_metrics.data_collector_jobs_total.inc()
 
     except KeyError as exception:
         APP.logger.warning('No url provided, request denied')

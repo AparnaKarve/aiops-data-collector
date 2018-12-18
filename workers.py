@@ -27,6 +27,21 @@ CHUNK = 10240
 MAX_RETRIES = 3
 
 
+def add_metrics(method: str, result: bool):
+    if method == 'get' and result is True:
+        prometheus_metrics.data_download_requests_total.inc()
+        prometheus_metrics.data_download_successful_requests_total.inc()
+    elif method == 'get' and result is False:
+        prometheus_metrics.data_download_requests_total.inc()
+        prometheus_metrics.data_download_request_exceptions.inc()
+
+    if method == 'post' and result is True:
+        prometheus_metrics.post_data_requests_total.inc()
+        prometheus_metrics.post_data_successful_requests_total.inc()
+    elif method == 'post' and result is False:
+        prometheus_metrics.post_data_requests_total.inc()
+        prometheus_metrics.post_data_request_exceptions.inc()
+
 def _retryable(method: str, *args, **kwargs) -> requests.Response:
     """Retryable HTTP request.
 
@@ -50,8 +65,10 @@ def _retryable(method: str, *args, **kwargs) -> requests.Response:
                     '%s: Request failed (attempt #%d), retrying: %s',
                     thread.name, attempt, str(e)
                 )
+                add_metrics(method, False)
                 continue
             else:
+                add_metrics(method, True)
                 return resp
 
     raise requests.HTTPError('All attempts failed')
@@ -76,13 +93,11 @@ def download_job(source_url: str, source_id: str, dest_url: str) -> None:
         # Fetch data
         try:
             resp = _retryable('get', source_url, stream=True)
-            prometheus_metrics.data_download_requests_total.inc()
         except requests.HTTPError as exception:
             logger.error(
                 '%s: Unable to fetch source data for "%s": %s',
                 thread.name, source_id, exception
             )
-            prometheus_metrics.data_download_request_exceptions.inc()
             return
 
         try:
@@ -110,13 +125,11 @@ def download_job(source_url: str, source_id: str, dest_url: str) -> None:
         # Pass to next service
         try:
             resp = _retryable('post', f'http://{dest_url}', json=data)
-            prometheus_metrics.post_data_requests_total.inc()
         except requests.HTTPError as exception:
             logger.error(
                 '%s: Failed to pass data for "%s": %s',
                 thread.name, source_id, exception
             )
-            prometheus_metrics.post_data_request_exceptions.inc()
 
         # Cleanup
         with suppress(IOError):
