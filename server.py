@@ -16,17 +16,19 @@ import multiprocess_metrics
 ROOT_LOGGER = logging.getLogger()
 ROOT_LOGGER.addHandler(default_handler)
 
-try:
-    multiprocess_metrics.multiprocess_metrics_prereq()
-    import prometheus_metrics
-except IOError as e:
-    # this is a non-starter for scraping metrics in the
-    # Multiprocess Mode (Gunicorn)
-    # terminate if there is an exception here
-    ROOT_LOGGER.error(
-        "Error while creating prometheus_multiproc_dir: %s", e
-    )
-    sys.exit(Arbiter.APP_LOAD_ERROR)
+import prometheus_metrics
+
+# try:
+#     multiprocess_metrics.multiprocess_metrics_prereq()
+#     import prometheus_metrics
+# except IOError as e:
+#     # this is a non-starter for scraping metrics in the
+#     # Multiprocess Mode (Gunicorn)
+#     # terminate if there is an exception here
+#     ROOT_LOGGER.error(
+#         "Error while creating prometheus_multiproc_dir: %s", e
+#     )
+#     sys.exit(Arbiter.APP_LOAD_ERROR)
 
 
 def create_application():
