@@ -1,13 +1,32 @@
 import logging
 import os
+import sys
 
 from flask import Flask, jsonify, request
 from flask.logging import default_handler
+from gunicorn.arbiter import Arbiter
 
 import workers
-import prometheus_metrics
 
 from collect_json_schema import CollectJSONSchema
+
+import multiprocess_metrics
+
+
+ROOT_LOGGER = logging.getLogger()
+ROOT_LOGGER.addHandler(default_handler)
+
+try:
+    multiprocess_metrics.multiprocess_metrics_prereq()
+    import prometheus_metrics
+except IOError as e:
+    # this is a non-starter for scraping metrics in the
+    # Multiprocess Mode (Gunicorn)
+    # terminate if there is an exception here
+    ROOT_LOGGER.error(
+        "Error while creating prometheus_multiproc_dir: %s", e
+    )
+    sys.exit(Arbiter.APP_LOAD_ERROR)
 
 
 def create_application():
@@ -20,9 +39,8 @@ def create_application():
 
 
 APP = create_application()
-ROOT_LOGGER = logging.getLogger()
+
 ROOT_LOGGER.setLevel(APP.logger.level)
-ROOT_LOGGER.addHandler(default_handler)
 
 VERSION = "0.0.1"
 
@@ -69,7 +87,7 @@ def post_collect():
 @APP.route("/metrics", methods=['GET'])
 def metrics():
     """Metrics Endpoint."""
-    return prometheus_metrics.generate_latest_metrics()
+    return prometheus_metrics.generate_aggregated_metrics()
 
 
 if __name__ == "__main__":

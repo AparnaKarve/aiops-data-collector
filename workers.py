@@ -4,15 +4,30 @@ import os
 from threading import Thread, current_thread
 from tempfile import NamedTemporaryFile
 from uuid import uuid4
+import sys
+from gunicorn.arbiter import Arbiter
 
 import requests
-import prometheus_metrics
+import multiprocess_metrics
+
 
 import custom_parser
 
 logger = logging.getLogger()
 CHUNK = 10240
 MAX_RETRIES = 3
+
+try:
+    multiprocess_metrics.multiprocess_metrics_prereq()
+    import prometheus_metrics
+except IOError as e:
+    # this is a non-starter for scraping metrics in the
+    # Multiprocess Mode (Gunicorn)
+    # terminate if there is an exception here
+    logger.error(
+        "Error while creating prometheus_multiproc_dir: %s", e
+    )
+    sys.exit(Arbiter.APP_LOAD_ERROR)
 
 
 def _retryable(method: str, *args, **kwargs) -> requests.Response:
