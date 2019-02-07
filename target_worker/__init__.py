@@ -14,20 +14,16 @@ logger = logging.getLogger()
 if os.environ.get('INPUT_DATA_FORMAT') == 'TOPOLOGY':
     logger.info('Target Worker is Topology')
 
-    USERNAME = os.environ.get('USERNAME')
-    PASSWORD = os.environ.get('PASSWORD')
     ENDPOINT = os.environ.get('TOPOLOGY_INVENTORY_ENDPOINT')
 
-    if not all((USERNAME, PASSWORD, ENDPOINT)):
+    if not ENDPOINT:
         logger.error('Environment not set properly, '
-                     'missing USERNAME or PASSWORD or '
-                     'TOPOLOGY_INVENTORY_ENDPOINT')
+                     'missing TOPOLOGY_INVENTORY_ENDPOINT')
         sys.exit(1)
 
     NAME = 'worker_topology'
     INFO = {
         'endpoint': ENDPOINT,
-        'auth': (USERNAME, PASSWORD),
         'queries': {
             'container_nodes': 'archived_at',
             'volume_attachments': '',

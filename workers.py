@@ -147,7 +147,6 @@ def download_job(
                     'get',
                     f'{topology_info["endpoint"]}/{entity}',
                     params={query_string: ''},
-                    auth=topology_info["auth"],
                     verify=False
                 )
                 data['data'][entity] = resp.json()
