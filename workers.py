@@ -138,10 +138,6 @@ def download_job(
             'data': {}
         }
 
-        endpoint = topology_info['authentication']['endpoint']
-        username = topology_info["authentication"]['username']
-        password = topology_info["authentication"]['password']
-
         for entity in topology_info['queries'].keys():
             prometheus_metrics.METRICS['gets'].inc()
 
@@ -149,8 +145,9 @@ def download_job(
             try:
                 resp = _retryable(
                     'get',
-                    f'{endpoint}/{entity}{query_string}',
-                    auth=(username, password),
+                    f'{topology_info["endpoint"]}/{entity}',
+                    params={query_string: query_string},
+                    auth=topology_info["auth"],
                     verify=False
                 )
                 data['data'][entity] = resp.json()
@@ -166,7 +163,12 @@ def download_job(
         # Pass to next service
         prometheus_metrics.METRICS['posts'].inc()
         try:
-            resp = _retryable('post', f'http://{dest_url}', json=data)
+            resp = _retryable(
+                'post',
+                f'http://{dest_url}',
+                json=data,
+                headers={"x-rh-identity": b64_identity}
+            )
             prometheus_metrics.METRICS['post_successes'].inc()
         except requests.HTTPError as exception:
             logger.error(

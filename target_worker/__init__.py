@@ -18,7 +18,7 @@ if os.environ.get('INPUT_DATA_FORMAT') == 'TOPOLOGY':
     PASSWORD = os.environ.get('PASSWORD')
     ENDPOINT = os.environ.get('TOPOLOGY_INVENTORY_ENDPOINT')
 
-    if None in [USERNAME, PASSWORD, ENDPOINT]:
+    if not all((USERNAME, PASSWORD, ENDPOINT)):
         logger.error('Environment not set properly, '
                      'missing USERNAME or PASSWORD or '
                      'TOPOLOGY_INVENTORY_ENDPOINT')
@@ -26,16 +26,13 @@ if os.environ.get('INPUT_DATA_FORMAT') == 'TOPOLOGY':
 
     NAME = 'worker_topology'
     INFO = {
-        'authentication': {
-            'username': USERNAME,
-            'password': PASSWORD,
-            'endpoint': ENDPOINT
-        },
+        'endpoint': ENDPOINT,
+        'auth': (USERNAME, PASSWORD),
         'queries': {
-            'container_nodes': '?archived_at=',
+            'container_nodes': 'archived_at',
             'volume_attachments': '',
-            'volumes': '?archived_at=',
-            'volume_types': '?archived_at='
+            'volumes': 'archived_at',
+            'volume_types': 'archived_at'
         }
     }
 
