@@ -29,10 +29,10 @@ if os.environ.get('INPUT_DATA_FORMAT') == 'TOPOLOGY':
         'endpoint': ENDPOINT,
         'auth': (USERNAME, PASSWORD),
         'queries': {
-            'container_nodes': 'archived_at',
-            'volume_attachments': '',
-            'volumes': 'archived_at',
-            'volume_types': 'archived_at'
+            'webhp': 'source',
+            # 'volume_attachments': '',
+            # 'volumes': 'archived_at',
+            # 'volume_types': 'archived_at'
         }
     }
 

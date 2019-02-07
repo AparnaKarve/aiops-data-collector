@@ -146,7 +146,7 @@ def download_job(
                 resp = _retryable(
                     'get',
                     f'{topology_info["endpoint"]}/{entity}',
-                    params={query_string: query_string},
+                    params={query_string},
                     auth=topology_info["auth"],
                     verify=False
                 )
