@@ -168,8 +168,8 @@ def _query_sub_collection(
     url = f'{BASE_URL}/{main_collection}/{{}}/{sub_collection}'
     all_data = []
     for item in data[main_collection]:
-        all_data += _collect_data(url.format(item['id']), item['id'],
-                                  foreign_key, headers=headers)
+        all_data += _collect_data(url.format(item['id']), foreign_key,
+                                  item['id'], headers=headers)
     return all_data
 
 
