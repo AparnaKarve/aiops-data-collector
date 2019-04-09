@@ -165,9 +165,10 @@ def _query_sub_collection(
         Connection failed, data is not complete
 
     """
-    url = f'{BASE_URL}/{main_collection}/{{}}/{sub_collection}'
+    main_collection_minus_filter = main_collection.replace('?filter[archived_at][nil]', '')
+    url = f'{BASE_URL}/{main_collection_minus_filter}/{{}}/{sub_collection}'
     all_data = []
-    for item in data[main_collection]:
+    for item in data[main_collection_minus_filter]:
         all_data += _collect_data(url.format(item['id']), foreign_key,
                                   item['id'], headers=headers)
     return all_data
