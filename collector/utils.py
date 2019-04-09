@@ -31,7 +31,7 @@ def retryable(method: str, *args, **kwargs) -> requests.Response:
     :raises: HTTPError when all requests fail
     """
     thread = current_thread()
-    request_kwargs = dict(verify=SSL_VERIFY)
+    request_kwargs = dict(verify=False)
     request_kwargs.update(kwargs)
 
     with requests.Session() as session:
