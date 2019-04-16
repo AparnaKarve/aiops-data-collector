@@ -1,5 +1,7 @@
 import os
 
+TENANTS_URL = os.environ.get('TENANTS_URL')
+ALL_TENANTS = os.environ.get('ALL_TENANTS', 'true').lower() in ['true', 'y']
 TOPOLOGICAL_INVENTORY_HOST = os.environ.get('TOPOLOGICAL_INVENTORY_HOST')
 TOPOLOGICAL_INVENTORY_PATH = os.environ.get('TOPOLOGICAL_INVENTORY_PATH')
 HOST_INVENTORY_HOST = os.environ.get('HOST_INVENTORY_HOST')

@@ -2,11 +2,13 @@ import logging
 import os
 from threading import current_thread
 
+import base64
+import json
 import yaml
 
 import prometheus_metrics
 from . import utils
-from .env import (APP_NAME,
+from .env import (APP_NAME, TENANTS_URL, ALL_TENANTS,
                   TOPOLOGICAL_INVENTORY_HOST, TOPOLOGICAL_INVENTORY_PATH)
 
 LOGGER = logging.getLogger()
@@ -191,12 +193,57 @@ def worker(_: str, source_id: str, dest: str, b64_identity: str) -> None:
     thread = current_thread()
     LOGGER.debug('%s: Worker started', thread.name)
 
+    headers = {"x-rh-identity": b64_identity}
+
+    if ALL_TENANTS:
+        resp = utils.retryable('get', TENANTS_URL, headers=headers)
+        tenants_headers = \
+            [tenant_header_info(t["external_tenant"]) for t in resp.json()]
+
+        LOGGER.info('Fetching data for ALL(%s) Tenants', len(tenants_headers))
+
+        for tenant_header in tenants_headers:
+            LOGGER.debug('%s: ---START Account# %s---',
+                         thread.name, tenant_header['acct_no'])
+            headers = tenant_header['headers']
+            topological_inventory_data(_, source_id, dest, headers, thread)
+            LOGGER.debug('%s: ---END Account# %s---',
+                         thread.name, tenant_header['acct_no'])
+    else:
+        LOGGER.info('Fetching data for current Tenant')
+        topological_inventory_data(_, source_id, dest, headers, thread)
+
+    LOGGER.debug('%s: Done, exiting', thread.name)
+
+
+def topological_inventory_data(
+        _: str,
+        source_id: str,
+        dest: str,
+        headers: dict,
+        thread
+) -> None:
+    """Generate Tenant data for topological inventory.
+
+    Parameters
+    ----------
+    _ (str)
+        Skipped
+    source_id (str)
+        Job identifier
+    dest (str)
+        URL where to pass data
+    headers (dict)
+        RH Identity header
+    thread
+        Current Thread
+
+    """
     # Build the POST data object
     data = {
         'id': source_id,
         'data': {}
     }
-    headers = {"x-rh-identity": b64_identity}
 
     for entity in APP_CONFIG:
         query_spec = QUERIES[entity]
@@ -238,7 +285,15 @@ def worker(_: str, source_id: str, dest: str, b64_identity: str) -> None:
             '%s: %s: %s\t%s',
             thread.name, source_id, entity, len(all_data)
         )
-        data['data'][entity] = all_data
+
+        if all_data:
+            data['data'][entity] = all_data
+        else:
+            LOGGER.debug(
+                '%s: Inadequate Topological Inventory data for this account.',
+                thread.name
+            )
+            return
 
     # Pass to next service
     prometheus_metrics.METRICS['posts'].inc()
@@ -252,4 +307,9 @@ def worker(_: str, source_id: str, dest: str, b64_identity: str) -> None:
         )
         prometheus_metrics.METRICS['post_errors'].inc()
 
-    LOGGER.debug('%s: Done, exiting', thread.name)
+
+def tenant_header_info(acct_no):
+    """Return a dict containing Account No. and it's b64 Identity header."""
+    rh_identity = dict(identity=dict(account_number=acct_no))
+    b64_identity = base64.b64encode(json.dumps(rh_identity).encode())
+    return {'acct_no': acct_no, 'headers': {'x-rh-identity': b64_identity}}
