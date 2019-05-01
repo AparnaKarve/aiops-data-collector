@@ -7,6 +7,8 @@ import base64
 import json
 import yaml
 
+import pandas as pd
+
 import prometheus_metrics
 from . import utils
 from .env import (APP_NAME, TENANTS_URL, ALL_TENANTS,
@@ -297,6 +299,11 @@ def topological_inventory_data(
 
         if all_data:
             data['data'][entity] = all_data
+
+            # Create CSV files for all entities
+            epd = pd.DataFrame(all_data)
+            epd.to_csv(f'/opt/app-root/src/instance_type_validation_csvs/04302019_{entity}.csv')
+
         else:
             LOGGER.debug(
                 '%s: Inadequate Topological Inventory data for this account.',
