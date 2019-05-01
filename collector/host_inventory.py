@@ -3,6 +3,8 @@ import json
 import logging
 import math
 
+import pandas as pd
+
 from threading import current_thread
 
 import prometheus_metrics
@@ -53,6 +55,10 @@ def _retrieve_hosts(headers: dict) -> dict:
         resp = utils.retryable('get', url_profile.format(ids), headers=headers)
         prometheus_metrics.METRICS['get_successes'].inc()
         results += resp.json()['results']
+
+    epd = pd.DataFrame(results)
+    # epd.to_csv(f'/Users/akarve/rh/aiops/aiops-dummy-ai-service/outlier_detection_csvs/{account_id}_hostinv.csv')
+    epd.to_csv(f'/opt/app-root/src/0501_hostinv.csv')
 
     return dict(results=results, total=total)
 
