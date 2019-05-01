@@ -27,3 +27,5 @@ aiops-instance-type-validation:
   - container_groups
   - containers
   - sources
+  - container_projects
+
