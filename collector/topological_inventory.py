@@ -28,6 +28,8 @@ SERVICES_URL = defaultdict(
     )
 )
 
+DATA_COLLECTION_TIME = prometheus_metrics.METRICS['data_collection_time']
+
 
 def _load_yaml(filename: str) -> dict:
     """Yaml filename loader helper.
@@ -227,14 +229,16 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
             LOGGER.debug('%s: ---START Account# %s---',
                          thread.name, tenant_header['acct_no'])
             headers = tenant_header['headers']
-            topological_inventory_data(_, source_id, dest, headers, thread)
-            utils.set_processed(tenant_header['acct_no'])
-            LOGGER.debug('%s: ---END Account# %s---',
-                         thread.name, tenant_header['acct_no'])
+            with DATA_COLLECTION_TIME.labels(account=tenant_header['acct_no']).time():
+                topological_inventory_data(_, source_id, dest, headers, thread)
+                utils.set_processed(tenant_header['acct_no'])
+                LOGGER.debug('%s: ---END Account# %s---',
+                             thread.name, tenant_header['acct_no'])
     else:
         LOGGER.info('Fetching data for current Tenant')
-        topological_inventory_data(_, source_id, dest, headers, thread)
-        utils.set_processed(account_id)
+        with DATA_COLLECTION_TIME.labels(account=account_id).time():
+            topological_inventory_data(_, source_id, dest, headers, thread)
+            utils.set_processed(account_id)
     LOGGER.debug('%s: Done, exiting', thread.name)
 
 
