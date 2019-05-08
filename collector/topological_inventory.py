@@ -6,6 +6,7 @@ from collections import defaultdict
 import base64
 import json
 import yaml
+from datetime import datetime
 
 import prometheus_metrics
 from . import utils
@@ -216,6 +217,8 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
     account_id = acct_info['account_id']
     headers = {"x-rh-identity": b64_identity}
 
+    today = datetime.today().strftime('%Y%m%d')
+
     if ALL_TENANTS:
         prometheus_metrics.METRICS['gets'].inc()
         resp = utils.retryable('get', TENANTS_URL, headers=headers)
@@ -229,14 +232,20 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
             LOGGER.debug('%s: ---START Account# %s---',
                          thread.name, tenant_header['acct_no'])
             headers = tenant_header['headers']
-            with DATA_COLLECTION_TIME.labels(account=tenant_header['acct_no']).time():
+            with DATA_COLLECTION_TIME.labels(
+                    account=tenant_header['acct_no'],
+                    collection_date=today
+            ).time():
                 topological_inventory_data(_, source_id, dest, headers, thread)
                 utils.set_processed(tenant_header['acct_no'])
                 LOGGER.debug('%s: ---END Account# %s---',
                              thread.name, tenant_header['acct_no'])
     else:
         LOGGER.info('Fetching data for current Tenant')
-        with DATA_COLLECTION_TIME.labels(account=account_id).time():
+        with DATA_COLLECTION_TIME.labels(
+                account=account_id,
+                collection_date=today
+        ).time():
             topological_inventory_data(_, source_id, dest, headers, thread)
             utils.set_processed(account_id)
     LOGGER.debug('%s: Done, exiting', thread.name)
