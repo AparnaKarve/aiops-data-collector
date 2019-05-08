@@ -44,6 +44,11 @@ METRICS = {
         'Time spent for complete data collection',
         ['account', 'collection_date']
     ),
+    'data_size': Summary(
+        'aiops_data_collector_data_size',
+        'Size of data in bytes',
+        ['account', 'collection_date']
+    ),
 }
 
 
