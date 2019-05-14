@@ -237,12 +237,13 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                 data_size = \
                     topological_inventory_data(_, source_id, dest,
                                                headers, thread)
-                if data_size > 0:
-                    prometheus_metrics.METRICS['data_size'].set(data_size)
-                else:
-                    import random
-                    for x in range(10):
-                        prometheus_metrics.METRICS['data_size'].set(random.randint(1, 101))
+                prometheus_metrics.METRICS['data_size'].observe(data_size)
+                # if data_size > 0:
+                #     prometheus_metrics.METRICS['data_size'].set(data_size)
+                # else:
+                #     import random
+                #     for x in range(10):
+                #         prometheus_metrics.METRICS['data_size'].set(random.randint(1, 101))
                 utils.set_processed(tenant_header['acct_no'])
                 LOGGER.debug('%s: ---END Account# %s---',
                              thread.name, tenant_header['acct_no'])
@@ -251,7 +252,7 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
         with DATA_COLLECTION_TIME.time():
             data_size = \
                 topological_inventory_data(_, source_id, dest, headers, thread)
-            prometheus_metrics.METRICS['data_size'].set(data_size)
+            prometheus_metrics.METRICS['data_size'].observe(data_size)
             utils.set_processed(account_id)
     LOGGER.debug('%s: Done, exiting', thread.name)
 
