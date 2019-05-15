@@ -44,7 +44,7 @@ METRICS = {
         'Time spent for complete data collection',
         # ['account', 'collection_date']
     ),
-    'data_size': Histogram(
+    'data_size': Counter(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
         # ['account', 'collection_date']
