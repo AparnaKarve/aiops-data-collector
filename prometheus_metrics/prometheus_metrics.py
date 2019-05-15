@@ -1,6 +1,8 @@
 from prometheus_client import (Counter, Gauge, Summary, Histogram, generate_latest,
                                CollectorRegistry, multiprocess)
 
+from prometheus_client.utils import INF
+
 # Prometheus Metrics
 METRICS = {
     'jobs_total': Counter(
@@ -44,9 +46,10 @@ METRICS = {
         'Time spent for complete data collection',
         # ['account', 'collection_date']
     ),
-    'data_size': Counter(
+    'data_size': Histogram(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
+        buckets=(1, 2, 3, 4, 5, 6, 7, 8, 9, INF),
         # ['account', 'collection_date']
     ),
     'data_size_above_ceiling': Gauge(
