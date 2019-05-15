@@ -247,8 +247,8 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                 utils.set_processed(tenant_header['acct_no'])
                 LOGGER.debug('%s: ---END Account# %s---',
                              thread.name, tenant_header['acct_no'])
-            if DATA_COLLECTION_TIME > 1:
-                print(f"{tenant_header['acct_no']} has data collection > 1")
+
+            print(f"{tenant_header['acct_no']} has data collection = {DATA_COLLECTION_TIME}")
     else:
         LOGGER.info('Fetching data for current Tenant')
         with DATA_COLLECTION_TIME.time():
