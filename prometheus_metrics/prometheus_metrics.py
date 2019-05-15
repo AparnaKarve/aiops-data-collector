@@ -1,4 +1,4 @@
-from prometheus_client import (Counter, Gauge, Summary, generate_latest,
+from prometheus_client import (Counter, Gauge, Summary, Histogram, generate_latest,
                                CollectorRegistry, multiprocess)
 
 # Prometheus Metrics
@@ -44,7 +44,7 @@ METRICS = {
         'Time spent for complete data collection',
         # ['account', 'collection_date']
     ),
-    'data_size': Gauge(
+    'data_size': Histogram(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
         # ['account', 'collection_date']
