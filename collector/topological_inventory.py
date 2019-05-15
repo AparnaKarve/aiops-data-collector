@@ -237,7 +237,7 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                 data_size = \
                     topological_inventory_data(_, source_id, dest,
                                                headers, thread)
-                prometheus_metrics.METRICS['data_size'].observe(data_size)
+                prometheus_metrics.METRICS['data_size'].set(data_size)
                 # if data_size > 0:
                 #     prometheus_metrics.METRICS['data_size'].set(data_size)
                 # else:
@@ -254,7 +254,7 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
         with DATA_COLLECTION_TIME.time():
             data_size = \
                 topological_inventory_data(_, source_id, dest, headers, thread)
-            prometheus_metrics.METRICS['data_size'].observe(data_size)
+            prometheus_metrics.METRICS['data_size'].set(data_size)
             utils.set_processed(account_id)
     LOGGER.debug('%s: Done, exiting', thread.name)
 
