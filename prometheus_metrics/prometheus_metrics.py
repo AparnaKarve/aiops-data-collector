@@ -47,6 +47,11 @@ METRICS = {
     'data_size': Gauge(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
+        # ['account', 'collection_date']
+    ),
+    'data_size_above_ceiling': Gauge(
+        'aiops_data_collector_data_size_above_ceiling',
+        'Size of data in bytes above ceiling',
         ['account', 'collection_date']
     ),
 }

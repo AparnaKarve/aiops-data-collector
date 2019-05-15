@@ -238,8 +238,9 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                 data_size = \
                     topological_inventory_data(_, source_id, dest,
                                            headers, thread)
+                prometheus_metrics.METRICS['data_size'].set(data_size)
                 if data_size > 0:
-                    prometheus_metrics.METRICS['data_size'].labels(
+                    prometheus_metrics.METRICS['data_size_above_ceiling'].labels(
                         account=tenant_header['acct_no'],
                         collection_date=today
                     ).set(data_size)
@@ -250,8 +251,9 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
             LOGGER.info('Fetching data for current Tenant')
             data_size = \
                 topological_inventory_data(_, source_id, dest, headers, thread)
+            prometheus_metrics.METRICS['data_size'].set(data_size)
             if data_size > 0:
-                prometheus_metrics.METRICS['data_size'].labels(
+                prometheus_metrics.METRICS['data_size_above_ceiling'].labels(
                     account=account_id,
                     collection_date=today
                 ).set(data_size)
@@ -330,7 +332,6 @@ def topological_inventory_data(
             )
             return 0.0
 
-    print(f"JSON size is {get_deep_size(data)}")
     # Pass to next service
     prometheus_metrics.METRICS['posts'].inc()
     try:
