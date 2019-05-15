@@ -325,12 +325,12 @@ def topological_inventory_data(
 
         if all_data:
             data['data'][entity] = all_data
-        else:
-            LOGGER.debug(
-                '%s: Inadequate Topological Inventory data for this account.',
-                thread.name
-            )
-            return 0.0
+        # else:
+        #     LOGGER.debug(
+        #         '%s: Inadequate Topological Inventory data for this account.',
+        #         thread.name
+        #     )
+        #     return 0.0
 
     # Pass to next service
     prometheus_metrics.METRICS['posts'].inc()

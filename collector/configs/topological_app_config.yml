@@ -1,11 +1,11 @@
 aiops-volume-type-validation:
-  - vms
   - container_nodes
   - container_nodes_tags
   - sources
   - volume_attachments
   - volumes
   - volume_types
+  - vms
 
 aiops-idle-cost-savings:
   - vms
