@@ -46,10 +46,10 @@ METRICS = {
         'Time spent for complete data collection',
         # ['account', 'collection_date']
     ),
-    'data_size': Gauge(
+    'data_size': Histogram(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
-        # buckets=(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, INF),
+        buckets=(500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, INF),
         # ['account', 'collection_date']
     ),
     'data_size_above_ceiling': Gauge(
