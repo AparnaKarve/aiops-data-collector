@@ -49,7 +49,7 @@ METRICS = {
     'data_size': Histogram(
         'aiops_data_collector_data_size',
         'Size of data in bytes',
-        # buckets=(1, 2, 3, 4, 5, 6, 7, 8, 9, INF),
+        buckets=(1, 2, 3, 4, 5, 6, 7, 8, 9, INF),
         # ['account', 'collection_date']
     ),
     'data_size_above_ceiling': Gauge(
