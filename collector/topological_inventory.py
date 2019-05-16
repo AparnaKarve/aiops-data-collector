@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 import yaml
 from objsize import get_deep_size
+import time
 
 import prometheus_metrics
 from . import utils
@@ -239,6 +240,8 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                     topological_inventory_data(_, source_id, dest,
                                            headers, thread)
                 prometheus_metrics.METRICS['data_size'].observe(data_size)
+
+                time.sleep(60)
 
                 if data_size > 0:
                     prometheus_metrics.METRICS['data_size_above_ceiling'].labels(
