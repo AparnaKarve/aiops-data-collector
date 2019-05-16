@@ -238,9 +238,7 @@ def worker(_: str, source_id: str, dest: str, acct_info: dict) -> None:
                 data_size = \
                     topological_inventory_data(_, source_id, dest,
                                            headers, thread)
-                prometheus_metrics.METRICS['data_size'].inc(data_size)
-
-                prometheus_metrics.METRICS['data_size'].dec(100)
+                prometheus_metrics.METRICS['data_size'].set(data_size)
 
                 if data_size > 0:
                     prometheus_metrics.METRICS['data_size_above_ceiling'].labels(
