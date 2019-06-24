@@ -113,11 +113,17 @@ def _collect_data(host: dict, url: str, fk_name: str = None,
     """
     # Collect data from the first page
     url = f'{host["host"]}/{host["path"]}/{url}'
+    print("url = ===== %s =====", url)
     prometheus_metrics.METRICS['gets'].inc()
     resp = utils.retryable('get', url, headers=headers)
     prometheus_metrics.METRICS['get_successes'].inc()
     resp = resp.json()
+
+    print("resp = ===== %s =====", resp)
+
     all_data = resp['data']
+
+    print("all_data = ===== %s =====", all_data)
 
     # Walk all pages
     while resp['links'].get('next'):
